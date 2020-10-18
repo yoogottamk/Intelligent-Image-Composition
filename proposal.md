@@ -37,6 +37,15 @@ TODO: add textual description
 ![Results from the paper](./images/results-paper.png)
 
 ## Project milestones and expected timeline
+| 19th Oct - 22nd Oct | color correction |
+| 23rd Oct - 26th Oct | face and body detection |
+| 27th Oct - 3rd Nov | Homography estimation |
+| 31st Oct | MID EVALUATION |
+| 4th Nov - 8th Nov | Image blending |
+| 8th Nov - 16th Nov | Buffer period for squashing potential bugs, optimizing the pipeline, working on the presentation |
+| 17th Nov - 18th Nov| Final Review and finishing touches. |
+| 19th Nov | FINAL EVALUATION |
+
 
 ## Dataset Requirement
 We will not be needing any dataset.
