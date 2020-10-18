@@ -37,8 +37,10 @@ TODO: add textual description
 ![Results from the paper](./images/results-paper.png)
 
 ## Project milestones and expected timeline
-| 19th Oct - 22nd Oct | color correction |
-| 23rd Oct - 26th Oct | face and body detection |
+| Date | Task |
+| --- | --- |
+| 19th Oct - 22nd Oct | Color correction |
+| 23rd Oct - 26th Oct | Face and body detection |
 | 27th Oct - 3rd Nov | Homography estimation |
 | 31st Oct | MID EVALUATION |
 | 4th Nov - 8th Nov | Image blending |
