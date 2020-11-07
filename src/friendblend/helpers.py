@@ -3,14 +3,17 @@ Helper stuff, non core logic functions
 """
 
 from functools import wraps
+import inspect
 import logging
+import time
 
+import cv2 as cv
 import numpy as np
 
 from friendblend import global_vars
 
 
-def fmt_print(string, thresh_len=80):
+def fmt_print(string, thresh_len=70):
     """
     Formats stuff for printing
     ensures that len(output) is around thresh_len
@@ -18,8 +21,9 @@ def fmt_print(string, thresh_len=80):
     string = str(string)
     string = string.replace("\n", " ")
 
-    if len(string) > 80:
-        string = string[:40] + " ... " + string[-40:]
+    if len(string) > thresh_len:
+        half_thresh_len = thresh_len // 2
+        string = string[:half_thresh_len] + " ... " + string[-half_thresh_len:]
 
     return " ".join(string.split())
 
@@ -52,7 +56,7 @@ def log_call(f, log_entry=True, log_exit=True):
 
         global_vars.logging_indent += 1
 
-        with np.printoptions(edgeitems=1):
+        with np.printoptions(edgeitems=1, precision=3):
             if log_entry:
                 log.debug(
                     "%s -> %s.%s(%s)",
@@ -62,14 +66,17 @@ def log_call(f, log_entry=True, log_exit=True):
                     fmt_print(stringify_call_params(*args, **kwargs),),
                 )
 
+            st = time.time()
             ret = f(*args, **kwargs)
+            en = time.time()
 
             global_vars.logging_indent -= 1
 
             if log_exit:
                 log.debug(
-                    "%s <- %s.%s(%s)",
+                    "%s <- [%.3f] %s.%s(%s)",
                     indent_offset,
+                    en - st,
                     f.__module__,
                     f.__qualname__,
                     fmt_print(ret),
@@ -109,5 +116,16 @@ def log_all_in_module(module, log_entry=True, log_exit=True):
 
     for attr in all_attrs:
         _func = getattr(module, attr)
-        if callable(_func):
+        if inspect.isclass(_func):
+            setattr(module, attr, log_all_methods(log_entry, log_exit)(_func))
+        elif callable(_func):
             setattr(module, attr, log_call(_func, log_entry, log_exit))
+
+
+def imshow(img):
+    cv.imshow("Press q to quit", img)
+    while 1:
+        if cv.waitKey(0) & 0xFF == ord("q"):
+            break
+
+    cv.destroyAllWindows()

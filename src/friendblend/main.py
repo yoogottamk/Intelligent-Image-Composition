@@ -11,13 +11,9 @@ from rich.logging import RichHandler
 
 from friendblend.processing.color_correction import apply_clahe
 from friendblend.processing.face_body_detection import get_bounds
-from friendblend.processing.keypoint import (
-    get_keypoints,
-    get_descriptors,
-    filter_keypoints,
-)
+from friendblend.processing.keypoint import ORB, filter_keypoints, find_homography
 from friendblend.processing import helpers as processing_helpers
-from friendblend.helpers import log_all_methods, log_all_in_module
+from friendblend.helpers import log_all_methods, log_all_in_module, imshow
 from friendblend import global_vars
 
 from friendblend import processing
@@ -71,28 +67,35 @@ class Blend:
         return get_bounds(img)
 
     @staticmethod
-    def get_valid_keypoints(img1, img2, bb1, bb2):
+    def get_homography(img1, img2, bb1, bb2):
         """
         Calculates and filters ORB descriptors
         """
-        kps1 = get_keypoints(img1)
-        kps2 = get_keypoints(img2)
+        orb1 = ORB(img1)
+        orb2 = ORB(img2)
+
+        kps1 = orb1.get_keypoints()
+        kps2 = orb2.get_keypoints()
 
         filtered_kps1 = filter_keypoints(bb1, bb2, kps1)
         filtered_kps2 = filter_keypoints(bb1, bb2, kps2)
 
-        ds1 = get_descriptors(img1, filtered_kps1)
-        ds2 = get_descriptors(img2, filtered_kps2)
+        ds1 = orb1.get_descriptors(filtered_kps1)
+        ds2 = orb2.get_descriptors(filtered_kps2)
 
-        return filtered_kps1, ds1, filtered_kps2, ds2
+        H = find_homography(kps1, ds1, kps2, ds2, img1, img2)
+
+        return H
 
     def blend(self):
         """
         Performs the FriendBlend algorithm
         """
+        # color correct images
         cc1 = Blend.color_correction(self.img1)
         cc2 = Blend.color_correction(self.img2)
 
+        # get face and body bounds
         fb1, bb1 = Blend.get_face_body_bounds(self.img1)
         fb2, bb2 = Blend.get_face_body_bounds(self.img2)
 
@@ -102,9 +105,16 @@ class Blend:
         boxed2 = processing_helpers.draw_box(cc2, fb2)
         boxed2 = processing_helpers.draw_box(boxed2, bb2)
 
-        kps1, ds1, kps2, ds2 = Blend.get_valid_keypoints(cc1, cc2, bb1, bb2)
+        imshow(boxed1)
+        imshow(boxed2)
 
-        return kps1, ds1, kps2, ds2
+        # compute homography (uses ORB)
+        H = Blend.get_homography(cc1, cc2, bb1, bb2)
+
+        warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
+        imshow(np.hstack([warp_img, cc2]))
+
+        return H
 
 
 if __name__ == "__main__":
@@ -113,9 +123,10 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(message)s",
-        handlers=[RichHandler(rich_tracebacks=True, show_time=False)],
+        handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=False)],
     )
-    img_path = "../misc/images/fullbody.jpg"
-    blend = Blend(img_path, img_path)
+    img1_path = "../misc/images/f1.png"
+    img2_path = "../misc/images/f2.png"
+    blend = Blend(img1_path, img2_path)
 
     blend.blend()
