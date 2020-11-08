@@ -123,6 +123,10 @@ def log_all_in_module(module, log_entry=True, log_exit=True):
 
 
 def imshow(img):
+    """
+    Displays an image
+    press q to quit the window
+    """
     cv.imshow("Press q to quit", img)
     while 1:
         if cv.waitKey(0) & 0xFF == ord("q"):

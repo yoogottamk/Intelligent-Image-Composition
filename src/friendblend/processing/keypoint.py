@@ -52,7 +52,7 @@ def filter_keypoints(box1, box2, kps):
     )
 
 
-def find_homography(kps1, ds1, kps2, ds2, img1, img2, n_keypoints=40, min_matches=200):
+def find_homography(kps1, ds1, kps2, ds2, n_keypoints=40, min_matches=200):
     """
     Uses bruteforce matcher with hamming distance to compute homography
     fails if matches found are less than `min_matches`
@@ -78,9 +78,6 @@ def find_homography(kps1, ds1, kps2, ds2, img1, img2, n_keypoints=40, min_matche
 
     src = np.array(src).reshape((-1, 1, 2))
     dest = np.array(dest).reshape((-1, 1, 2))
-
-    # TODO: after this starts working, remove img1 and img2 params and this
-    imshow(cv.drawMatches(img1, kps1, img2, kps2, matches, None))
 
     H, mask = cv.findHomography(src, dest, cv.RANSAC)
 
