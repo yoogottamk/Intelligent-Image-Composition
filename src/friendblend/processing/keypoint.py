@@ -67,14 +67,14 @@ def find_homography(kps1, ds1, kps2, ds2, img1, img2, n_keypoints=40, min_matche
         log.error("Expected >= %d matches but only found %d", min_matches, n_matches)
         sys.exit(1)
 
-    matches = matches  # [:n_keypoints]
+    matches = matches[:n_keypoints]
 
     src = []
     dest = []
 
     for match in matches:
         src.append(kps1[match.queryIdx].pt)
-        dest.append(kps2[match.queryIdx].pt)
+        dest.append(kps2[match.trainIdx].pt)
 
     src = np.array(src).reshape((-1, 1, 2))
     dest = np.array(dest).reshape((-1, 1, 2))
@@ -82,9 +82,9 @@ def find_homography(kps1, ds1, kps2, ds2, img1, img2, n_keypoints=40, min_matche
     # TODO: after this starts working, remove img1 and img2 params and this
     imshow(cv.drawMatches(img1, kps1, img2, kps2, matches, None))
 
-    H, success = cv.findHomography(src, dest, cv.RANSAC)
+    H, mask = cv.findHomography(src, dest, cv.RANSAC)
 
-    if not success.any():
+    if not mask.any():
         log.error("Couldn't compute homography")
         sys.exit(1)
 

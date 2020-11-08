@@ -26,7 +26,7 @@ def get_face(img):
         sys.exit(1)
 
     try:
-        face = face_cascade.detectMultiScale(img_gray)[0]
+        face = face_cascade.detectMultiScale(img_gray, minNeighbors=7)[0]
     except IndexError as e:
         print(e)
         print("--(!)No faces detected")

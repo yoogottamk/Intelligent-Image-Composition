@@ -83,7 +83,7 @@ class Blend:
         ds1 = orb1.get_descriptors(filtered_kps1)
         ds2 = orb2.get_descriptors(filtered_kps2)
 
-        H = find_homography(kps1, ds1, kps2, ds2, img1, img2)
+        H = find_homography(filtered_kps1, ds1, filtered_kps2, ds2, img1, img2)
 
         return H
 
