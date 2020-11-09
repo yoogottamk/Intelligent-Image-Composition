@@ -11,6 +11,7 @@ import cv2 as cv
 import numpy as np
 from rich.logging import RichHandler
 
+from friendblend.processing.alpha_blending import alpha_blend
 from friendblend.processing.color_correction import apply_clahe
 from friendblend.processing.face_body_detection import get_bounds
 from friendblend.processing.keypoint import ORB, filter_keypoints, find_homography
@@ -23,7 +24,7 @@ from friendblend import processing
 log_all_in_module(processing.color_correction)
 log_all_in_module(processing.face_body_detection)
 log_all_in_module(processing.keypoint)
-
+log_all_in_module(processing.alpha_blending)
 
 def _process_blend(img):
     """
@@ -128,6 +129,28 @@ class Blend:
 
         return color_corrected, face_bounds, body_bounds, illustrated_bounds
 
+    @staticmethod
+    def get_alpha_blend_order(img1, img2, bb1, bb2):
+
+        # initial guess
+        img_l, img_r = img1, img2
+        bb_l, bb_r = bb1, bb2
+
+        # verify
+        if (bb1[0] + bb1[2]) > bb2[0]:
+            img_l, img_r = img2, img1
+            bb_l, bb_r = bb2, bb1
+
+        # if both fail
+        assert (bb_l[0] + bb_l[2]) < bb_r[0], "Images are not suitable for alpha blending!"
+
+        return img_l, img_r, bb_l, bb_r 
+
+    @staticmethod
+    def get_alpha_blend(img_l, img_r, bb_l, bb_r):
+
+        return alpha_blend(img_l, img_r, bb_l, bb_r)
+
     def blend(self):
         """
         Performs the FriendBlend algorithm
@@ -147,9 +170,15 @@ class Blend:
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
+        img_l, img_r, bb_l, bb_r = Blend.get_alpha_blend_order(warp_img, cc2, bb1, bb2)
+       
+        ab = Blend.get_alpha_blend(img_l, img_r, bb_l, bb_r)
+        imshow(ab)
+
         return H
 
 
+global_vars.initialize()
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
@@ -158,7 +187,6 @@ if __name__ == "__main__":
     )
     log = logging.getLogger()
 
-    global_vars.initialize()
 
     if len(sys.argv) != 3:
         log.warning(
