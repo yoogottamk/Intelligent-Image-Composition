@@ -12,9 +12,16 @@ __all__ = ["rgb2lab", "clahe", "apply_clahe"]
 def rgb2lab(img):
     """
     Converts an RGB image to L*a*b* space
+    Implements formulas described at:
+    https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html
     """
 
     def f(X):
+        """
+        Helper function for RGB to Lab conversion
+        Detailed description in the link above
+        """
+
         X = X.copy()
 
         mask1 = X > 0.008856
@@ -25,11 +32,14 @@ def rgb2lab(img):
 
         return X
 
+    # converts image to be in [0,1] range
     img = img.astype("float64")
     img /= 255.0
 
+    # accounts for sRGB conversion
     img = img ** 2.2
 
+    # converts to XYZ first
     X = (
         (img[:, :, 0] * 0.412453)
         + (img[:, :, 1] * 0.357580)
@@ -46,10 +56,12 @@ def rgb2lab(img):
         + (img[:, :, 2] * 0.950227)
     )
 
+    # initializing constants
     Xn = 0.950456
     Zn = 1.088754
     delta = 0
 
+    # converting from XYZ to Lab as described by the formulas
     X /= Xn
     Z /= Zn
 
@@ -60,6 +72,7 @@ def rgb2lab(img):
     L[mask1] = 116 * (L[mask1] ** (1 / 3)) - 16
     L[mask2] = 903.3 * L[mask2]
 
+    # f(X) defined above
     a = 500 * (f(X) - f(Y)) + delta
     b = 200 * (f(Y) - f(Z)) + delta
 
@@ -71,8 +84,15 @@ def rgb2lab(img):
 
 
 def _interpolate(c_sub_bin, map_ul, map_ur, map_dl, map_dr, x_frame_size, y_frame_size):
+    """
+    Interpolates the values of the pixels in patches around the current pixel patch and
+    finds the value for the current pixel
+    """
+
+    # initializing output
     c_sub_image = np.zeros(c_sub_bin.shape)
 
+    # implementing the formula
     for i in range(x_frame_size):
         i_inv = x_frame_size - i
         for j in range(y_frame_size):
@@ -89,6 +109,9 @@ def _interpolate(c_sub_bin, map_ul, map_ur, map_dl, map_dr, x_frame_size, y_fram
 def generate_histograms(
     bins, n_bins, grid_x_divs, grid_y_divs, x_frame_size, y_frame_size
 ):
+    """
+    Generates the histogram required for each patch
+    """
     hist = np.zeros((grid_x_divs, grid_y_divs, n_bins))
 
     for i in range(grid_x_divs):
@@ -109,6 +132,9 @@ def generate_histograms(
 
 
 def clip_histogram(hist, clip_limit, n_bins, grid_x_divs, grid_y_divs):
+    """
+    Clips the histograms using the limit set
+    """
     for i in range(grid_x_divs):
         for j in range(grid_y_divs):
             total_overflow = 0
@@ -150,6 +176,9 @@ def clip_histogram(hist, clip_limit, n_bins, grid_x_divs, grid_y_divs):
 
 
 def create_eq_mappings(hist, n_bins, frame_size, grid_x_divs, grid_y_divs):
+    """
+    Creates the histogram equalization mapping function for each patch
+    """
     max_val = 255
     min_val = 0
 
@@ -167,6 +196,11 @@ def create_eq_mappings(hist, n_bins, frame_size, grid_x_divs, grid_y_divs):
 
 
 def interpolate(res, maps, bins, grid_x_divs, grid_y_divs, x_frame_size, y_frame_size):
+    """
+    Wrapper function for the above _interpolate function
+    Performs the interpolation on pixels of each patch
+    """
+
     x_offset = 0
     for i in range(grid_x_divs):
         x_up = max(0, i - 1)
@@ -176,19 +210,23 @@ def interpolate(res, maps, bins, grid_x_divs, grid_y_divs, x_frame_size, y_frame
             y_left = max(0, j - 1)
             y_right = min(j, grid_y_divs - 1)
 
+            # gets the equalization maps of neighboring patches
             map_ul = maps[x_up, y_left]
             map_ur = maps[x_up, y_right]
             map_dl = maps[x_down, y_left]
             map_dr = maps[x_down, y_right]
 
+            # gets the current bin
             c_sub_bin = bins[
                 x_offset : x_offset + x_frame_size, y_offset : y_offset + y_frame_size
             ]
 
+            # gets the interpolated values for current patch
             c_sub_image = _interpolate(
                 c_sub_bin, map_ul, map_ur, map_dl, map_dr, x_frame_size, y_frame_size
             )
 
+            # adds current patch interpolated values to the final result
             res[
                 x_offset : x_offset + x_frame_size, y_offset : y_offset + y_frame_size
             ] = c_sub_image
@@ -200,11 +238,11 @@ def interpolate(res, maps, bins, grid_x_divs, grid_y_divs, x_frame_size, y_frame
 
 def clahe(img, clip_limit=3.0, n_bins=256, grid=(7, 7)):
     """
-     - Divides the image into frames/cells using the grid values passed to the function
-     - Creates a separate histogram for each cell/frame after binning the values
-     - The histogram equalization mapping for each cell/frame is also generated
-     - The contrast of the image is limited by clipping bin values with 'clip_limit'
-     - Adaptive histogram equalization
+    - Divides the image into frames/cells using the grid values passed to the function
+    - Creates a separate histogram for each cell/frame after binning the values
+    - The histogram equalization mapping for each cell/frame is also generated
+    - The contrast of the image is limited by clipping bin values with 'clip_limit'
+    - Adaptive histogram equalization
     """
     h, w = img.shape
     grid_x_divs, grid_y_divs = list(map(int, grid))
@@ -263,8 +301,11 @@ def apply_clahe(img, clip_limit=3.0, n_bins=256, grid=(7, 7)):
      - Grid size to be used while performing adaptive histogram equalization
     """
     img = img[:, :, ::-1].copy()
+
+    # conversion to Lab space
     img_lab = rgb2lab(img)
 
+    # performing CLAHE on L channel and replacing original L channel with it
     clahe_L = clahe(img_lab[:, :, 0], clip_limit, n_bins, grid)
     img_clahe = np.dstack([clahe_L, img_lab[:, :, 1], img_lab[:, :, 2]])
 
