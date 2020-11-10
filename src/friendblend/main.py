@@ -26,6 +26,7 @@ log_all_in_module(processing.face_body_detection)
 log_all_in_module(processing.keypoint)
 log_all_in_module(processing.alpha_blending)
 
+
 def _process_blend(img):
     """
     only functions at module level are pickle-able
@@ -142,9 +143,11 @@ class Blend:
             bb_l, bb_r = bb2, bb1
 
         # if both fail
-        assert (bb_l[0] + bb_l[2]) < bb_r[0], "Images are not suitable for alpha blending!"
+        assert (bb_l[0] + bb_l[2]) < bb_r[
+            0
+        ], "Images are not suitable for alpha blending!"
 
-        return img_l, img_r, bb_l, bb_r 
+        return img_l, img_r, bb_l, bb_r
 
     @staticmethod
     def get_alpha_blend(img_l, img_r, bb_l, bb_r):
@@ -171,7 +174,7 @@ class Blend:
         # imshow(np.hstack([warp_img, cc2]))
 
         img_l, img_r, bb_l, bb_r = Blend.get_alpha_blend_order(warp_img, cc2, bb1, bb2)
-       
+
         ab = Blend.get_alpha_blend(img_l, img_r, bb_l, bb_r)
         imshow(ab)
 
@@ -186,7 +189,6 @@ if __name__ == "__main__":
         handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=False)],
     )
     log = logging.getLogger()
-
 
     if len(sys.argv) != 3:
         log.warning(
