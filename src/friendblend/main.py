@@ -161,19 +161,22 @@ class Blend:
         # initial guess
         img_l, img_r = img1, img2
         bb_l, bb_r = bb1, bb2
+        fb_l, fb_r = fb1, fb2
 
         # Compare size of face bounding boxes
         if(fb1[2] * fb1[3] < fb2[2] * fb2[3]):
             img_l, img_r = img2, img1
             bb_l, bb_r = bb2, bb1
+            fb_l, fb_r = fb2, fb1
+
 
         # returns image with larger face bounding box as first image
-        return img_l, img_r, bb_l, bb_r
+        return img_l, img_r, bb_l, bb_r, fb_l, fb_r
 
     @staticmethod
-    def get_grab_cut(img_l, img_r, bb_l, bb_r):
+    def get_grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r):
 
-        return grab_cut(img_l, img_r, bb_l, bb_r)
+        return grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
 
 
     def blend(self):
@@ -195,7 +198,9 @@ class Blend:
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
-        img_l, img_r, bb_l, bb_r = Blend.get_alpha_blend_order(warp_img, cc2, bb1, bb2)
+        img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grab_cut_order(warp_img, cc2, bb1, bb2, fb1, fb2)
+
+        gc = Blend.get_grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
 
         ab = Blend.get_alpha_blend(img_l, img_r, bb_l, bb_r)
         imshow(ab)
