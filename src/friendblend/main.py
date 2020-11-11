@@ -14,6 +14,7 @@ from rich.logging import RichHandler
 from friendblend.processing.alpha_blending import alpha_blend
 from friendblend.processing.color_correction import apply_clahe
 from friendblend.processing.face_body_detection import get_bounds
+from friendblend.processing.grab_cut import grab_cut
 from friendblend.processing.keypoint import ORB, filter_keypoints, find_homography
 from friendblend.processing import helpers as processing_helpers
 from friendblend.helpers import log_all_methods, log_all_in_module, imshow
@@ -25,6 +26,7 @@ log_all_in_module(processing.color_correction)
 log_all_in_module(processing.face_body_detection)
 log_all_in_module(processing.keypoint)
 log_all_in_module(processing.alpha_blending)
+log_all_in_module(processing.grab_cut)
 
 
 def _process_blend(img):
@@ -153,6 +155,26 @@ class Blend:
     def get_alpha_blend(img_l, img_r, bb_l, bb_r):
 
         return alpha_blend(img_l, img_r, bb_l, bb_r)
+    
+    @staticmethod
+    def get_grab_cut_order(img1, img2, fb1, fb2, bb1, bb2):
+        # initial guess
+        img_l, img_r = img1, img2
+        bb_l, bb_r = bb1, bb2
+
+        # Compare size of face bounding boxes
+        if(fb1[2] * fb1[3] < fb2[2] * fb2[3]):
+            img_l, img_r = img2, img1
+            bb_l, bb_r = bb2, bb1
+
+        # returns image with larger face bounding box as first image
+        return img_l, img_r, bb_l, bb_r
+
+    @staticmethod
+    def get_grab_cut(img_l, img_r, bb_l, bb_r):
+
+        return grab_cut(img_l, img_r, bb_l, bb_r)
+
 
     def blend(self):
         """
@@ -179,6 +201,7 @@ class Blend:
         imshow(ab)
 
         return H
+    
 
 
 global_vars.initialize()
