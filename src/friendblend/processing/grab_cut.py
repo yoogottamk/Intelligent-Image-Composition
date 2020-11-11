@@ -26,22 +26,21 @@ def grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r):
     mask, fg_model, bg_model = cv.grabCut(img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK)
 
     mask = np.where((mask==2)|(mask==0),0,1).astype('uint8') 
-    img = img_l * mask[:,:,np.newaxis]   
+    img = img_l * mask[:,:,np.newaxis]
+
+
     
     return crop_fg(img, img_r)
 
 
 def crop_fg(fg,bg):
-    
-    fg = cv.cvtColor(fg,cv.COLOR_BGR2RGB)   
-    bg = cv.cvtColor(bg,cv.COLOR_BGR2RGB)
-    
+
     # TODO: move this line elsewhere in pipeline to handle image sizes
     bg = bg[bg.shape[0]-fg.shape[0]:bg.shape[0],bg.shape[1]-fg.shape[1]:bg.shape[1],:]
 
     # performing erosion on binary fg image
 
-    gray_fg = cv.cvtColor(fg,cv.COLOR_RGB2GRAY)
+    gray_fg = cv.cvtColor(fg,cv.COLOR_BGR2GRAY)
     _,mask = cv.threshold(gray_fg,0,1,cv.THRESH_BINARY)
 
     erosion_kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE,(3,3))
