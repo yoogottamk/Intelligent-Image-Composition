@@ -201,6 +201,7 @@ class Blend:
         img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grab_cut_order(warp_img, cc2, bb1, bb2, fb1, fb2)
 
         gc = Blend.get_grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
+        imshow(gc)
 
         ab = Blend.get_alpha_blend(img_l, img_r, bb_l, bb_r)
         imshow(ab)
