@@ -45,8 +45,9 @@ class Blend:
 
     def __init__(self, img1_path: str, img2_path: str):
         self.log = logging.getLogger()
-        self.img1 = self.imload(img1_path, ensure_success=True)
-        self.img2 = self.imload(img2_path, ensure_success=True)
+        self.img1 = Blend.resize(self.imload(img1_path, ensure_success=True), 900, None)
+        self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, None)
+        print(self.img1.shape)
 
     def imload(
         self, img_path, mode: int = 1, ensure_success: bool = False
@@ -65,6 +66,23 @@ class Blend:
                 sys.exit(1)
 
         return im
+
+    @staticmethod
+    def resize(img: np.ndarray, w: int, h: int) -> np.ndarray:
+        """
+        Resizes image to (w, h)
+        """
+        if h is None and w is None:
+            return img
+
+        if h is None:
+            r = img.shape[1] / w
+            h = img.shape[0] / r
+        elif w is None:
+            r = img.shape[0] / h
+            w = img.shape[1] / r
+
+        return cv.resize(img, (int(w), int(h)), interpolation=cv.INTER_CUBIC)
 
     @staticmethod
     def color_correction(img, clip_limit=3.0, n_bins=256, grid=(7, 7)):
@@ -133,51 +151,53 @@ class Blend:
         return color_corrected, face_bounds, body_bounds, illustrated_bounds
 
     @staticmethod
-    def get_alpha_blend_order(img1, img2, bb1, bb2):
-
+    def order_images(img1, img2, fb1, fb2, bb1, bb2, boxed1, boxed2):
+        """
+        Orders images and related variables such that the first image has face on the left
+        """
         # initial guess
-        img_l, img_r = img1, img2
-        bb_l, bb_r = bb1, bb2
+        imgs = [img1, img2]
+        fbs = [fb1, fb2]
+        bbs = [bb1, bb2]
+        boxeds = [boxed1, boxed2]
 
-        # verify
         if (bb1[0] + bb1[2]) > bb2[0]:
-            img_l, img_r = img2, img1
-            bb_l, bb_r = bb2, bb1
+            imgs.reverse()
+            fbs.reverse()
+            bbs.reverse()
+            boxeds.reverse()
 
-        # if both fail
-        assert (bb_l[0] + bb_l[2]) < bb_r[
-            0
-        ], "Images are not suitable for alpha blending!"
-
-        return img_l, img_r, bb_l, bb_r
+        return *imgs, *fbs, *bbs, *boxeds
 
     @staticmethod
     def get_alpha_blend(img_l, img_r, bb_l, bb_r):
-
+        """
+        blends the images using alpha blending
+        """
         return alpha_blend(img_l, img_r, bb_l, bb_r)
-    
+
     @staticmethod
-    def get_grab_cut_order(img1, img2, fb1, fb2, bb1, bb2):
+    def get_grabcut_order(img1, img2, fb1, fb2, bb1, bb2):
+        """
+        orders the images such that
+        """
         # initial guess
         img_l, img_r = img1, img2
         bb_l, bb_r = bb1, bb2
         fb_l, fb_r = fb1, fb2
 
         # Compare size of face bounding boxes
-        if(fb1[2] * fb1[3] < fb2[2] * fb2[3]):
+        if fb1[2] * fb1[3] < fb2[2] * fb2[3]:
             img_l, img_r = img2, img1
             bb_l, bb_r = bb2, bb1
             fb_l, fb_r = fb2, fb1
-
 
         # returns image with larger face bounding box as first image
         return img_l, img_r, bb_l, bb_r, fb_l, fb_r
 
     @staticmethod
-    def get_grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r):
-
+    def get_grabcut(img_l, img_r, bb_l, bb_r, fb_l, fb_r):
         return grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
-
 
     def blend(self):
         """
@@ -189,6 +209,10 @@ class Blend:
         cc1, fb1, bb1, boxed1 = r1
         cc2, fb2, bb2, boxed2 = r2
 
+        cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2 = Blend.order_images(
+            cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2
+        )
+
         # imshow(boxed1)
         # imshow(boxed2)
 
@@ -198,16 +222,20 @@ class Blend:
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
-        img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grab_cut_order(warp_img, cc2, bb1, bb2, fb1, fb2)
+        if abs(bb1[0] - bb2[0]) > 200:
+            print(abs(bb1[0] - bb2[0]))
+            self.log.info("Using Alpha Blending to merge the images")
+            blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
+        else:
+            self.log.info("Using GrabCut to merge the images")
+            img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grabcut_order(
+                warp_img, cc2, bb1, bb2, fb1, fb2
+            )
+            blended = Blend.get_grabcut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
 
-        gc = Blend.get_grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
-        imshow(gc)
+        imshow(blended)
 
-        ab = Blend.get_alpha_blend(img_l, img_r, bb_l, bb_r)
-        imshow(ab)
-
-        return H
-    
+        return blended
 
 
 global_vars.initialize()

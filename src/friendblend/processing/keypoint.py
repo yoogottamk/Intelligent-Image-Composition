@@ -52,7 +52,7 @@ def filter_keypoints(box1, box2, kps):
     )
 
 
-def find_homography(kps1, ds1, kps2, ds2, n_keypoints=40, min_matches=200):
+def find_homography(kps1, ds1, kps2, ds2, max_distance=30, min_matches=200):
     """
     Uses bruteforce matcher with hamming distance to compute homography
     fails if matches found are less than `min_matches`
@@ -60,14 +60,12 @@ def find_homography(kps1, ds1, kps2, ds2, n_keypoints=40, min_matches=200):
     log = logging.getLogger()
 
     matches = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True).match(ds1, ds2)
-    matches = sorted(matches, key=lambda x: x.distance)
+    matches = list(filter(lambda x: x.distance < max_distance, matches))
 
     n_matches = len(matches)
     if n_matches < min_matches:
         log.error("Expected >= %d matches but only found %d", min_matches, n_matches)
         sys.exit(1)
-
-    matches = matches[:n_keypoints]
 
     src = []
     dest = []
