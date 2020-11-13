@@ -47,7 +47,6 @@ class Blend:
         self.log = logging.getLogger()
         self.img1 = Blend.resize(self.imload(img1_path, ensure_success=True), 900, None)
         self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, None)
-        print(self.img1.shape)
 
     def imload(
         self, img_path, mode: int = 1, ensure_success: bool = False
@@ -150,8 +149,7 @@ class Blend:
 
         return color_corrected, face_bounds, body_bounds, illustrated_bounds
 
-    @staticmethod
-    def order_images(img1, img2, fb1, fb2, bb1, bb2, boxed1, boxed2):
+    def order_images(self, img1, img2, fb1, fb2, bb1, bb2, boxed1, boxed2):
         """
         Orders images and related variables such that the first image has face on the left
         """
@@ -162,6 +160,8 @@ class Blend:
         boxeds = [boxed1, boxed2]
 
         if (bb1[0] + bb1[2]) > bb2[0]:
+            self.img2, self.img1 = self.img1, self.img2
+            self.log.info("Swapping image order")
             imgs.reverse()
             fbs.reverse()
             bbs.reverse()
@@ -193,11 +193,11 @@ class Blend:
             fb_l, fb_r = fb2, fb1
 
         # returns image with larger face bounding box as first image
-        return img_l, img_r, bb_l, bb_r, fb_l, fb_r
+        return img_l, img_r, fb_l, fb_r, bb_l, bb_r
 
     @staticmethod
-    def get_grabcut(img_l, img_r, bb_l, bb_r, fb_l, fb_r):
-        return grab_cut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
+    def get_grabcut(img_l, img_r, bb_l, fb_l):
+        return grab_cut(img_l, img_r, bb_l, fb_l)
 
     def blend(self):
         """
@@ -209,7 +209,7 @@ class Blend:
         cc1, fb1, bb1, boxed1 = r1
         cc2, fb2, bb2, boxed2 = r2
 
-        cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2 = Blend.order_images(
+        cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2 = self.order_images(
             cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2
         )
 
@@ -231,7 +231,7 @@ class Blend:
             img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grabcut_order(
                 warp_img, cc2, bb1, bb2, fb1, fb2
             )
-            blended = Blend.get_grabcut(img_l, img_r, bb_l, bb_r, fb_l, fb_r)
+            blended = Blend.get_grabcut(img_l, img_r, bb_l, fb_l)
 
         imshow(blended)
 
@@ -241,7 +241,7 @@ class Blend:
 global_vars.initialize()
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format="%(message)s",
         handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=False)],
     )
