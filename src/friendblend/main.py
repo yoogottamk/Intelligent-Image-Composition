@@ -167,7 +167,7 @@ class Blend:
             bbs.reverse()
             boxeds.reverse()
 
-        return *imgs, *fbs, *bbs, *boxeds
+        return (*imgs, *fbs, *bbs, *boxeds)
 
     @staticmethod
     def get_alpha_blend(img_l, img_r, bb_l, bb_r):
