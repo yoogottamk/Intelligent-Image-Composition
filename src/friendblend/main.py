@@ -196,8 +196,8 @@ class Blend:
         return img_l, img_r, fb_l, fb_r, bb_l, bb_r
 
     @staticmethod
-    def get_grabcut(img_l, img_r, bb_l, fb_l):
-        return grab_cut(img_l, img_r, bb_l, fb_l)
+    def get_grabcut(img_l, img_r, fb_l):
+        return grab_cut(img_l, img_r, fb_l)
 
     def blend(self):
         """
@@ -231,7 +231,7 @@ class Blend:
             img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grabcut_order(
                 warp_img, cc2, bb1, bb2, fb1, fb2
             )
-            blended = Blend.get_grabcut(img_l, img_r, bb_l, fb_l)
+            blended = Blend.get_grabcut(img_l, img_r, fb_l)
 
         imshow(blended)
 
