@@ -46,7 +46,7 @@ class Blend:
     def __init__(self, img1_path: str, img2_path: str):
         self.log = logging.getLogger()
         self.img1 = Blend.resize(self.imload(img1_path, ensure_success=True), 900, None)
-        self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, None)
+        self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, self.img1.shape[0])
 
     def imload(
         self, img_path, mode: int = 1, ensure_success: bool = False
@@ -222,8 +222,7 @@ class Blend:
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
-        if abs(bb1[0] - bb2[0]) > 200:
-            print(abs(bb1[0] - bb2[0]))
+        if abs(bb1[0] + bb1[2] - bb2[0]) > 50:
             self.log.info("Using Alpha Blending to merge the images")
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
         else:
@@ -233,7 +232,7 @@ class Blend:
             )
             blended = Blend.get_grabcut(img_l, img_r, fb_l)
 
-        imshow(blended)
+        # imshow(blended)
 
         return blended
 
@@ -241,9 +240,9 @@ class Blend:
 global_vars.initialize()
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(message)s",
-        handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=False)],
+        handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=True)],
     )
     log = logging.getLogger()
 
@@ -261,4 +260,4 @@ if __name__ == "__main__":
 
     blend = Blend(img1_path, img2_path)
 
-    blend.blend()
+    cv.imwrite("../images/h-out.png", blend.blend())

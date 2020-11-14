@@ -41,7 +41,7 @@ def grab_cut(img_l, img_r, fb_l, boundary=15):
     ).astype("uint8")
     img = img_l * mask[:, :, np.newaxis]
 
-    imshow(img)
+    # imshow(img)
 
     return crop_fg(img, img_r)
 
