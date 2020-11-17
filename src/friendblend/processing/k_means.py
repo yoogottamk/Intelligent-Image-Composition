@@ -81,3 +81,10 @@ class KMeans:
 
         plt.show()
 
+
+if __name__ == "__main__":
+    A = np.random.randint(0, 255, (5000, 2))
+    k = KMeans(A, k=5, n_iters=2, DEBUG=True)
+    k.get_clusters()
+    k.plot()
+
