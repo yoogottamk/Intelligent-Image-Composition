@@ -14,6 +14,8 @@ def grab_cut(img_l, img_r, fb_l, boundary=15):
      - extracts face from img_l using face bounding boxes
      - blends the two images
     """
+
+    # Allocate memory for grabcut
     fg_model = np.zeros((1, 65), np.float64)
     bg_model = np.zeros((1, 65), np.float64)
 
@@ -32,10 +34,13 @@ def grab_cut(img_l, img_r, fb_l, boundary=15):
         max(0, fb_x - boundary) : min(fb_x + fb_w + boundary, w),
     ] = cv.GC_FGD
 
+
+    # Run grabcut
     mask, fg_model, bg_model = cv.grabCut(
         img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
     )
 
+    # Mask out image using mask obtained from grabcut
     mask = np.where(
         np.bitwise_or(mask == cv.GC_PR_BGD, mask == cv.GC_BGD), 0, 1
     ).astype("uint8")
@@ -47,12 +52,7 @@ def grab_cut(img_l, img_r, fb_l, boundary=15):
 
 
 def crop_fg(fg, bg):
-    # TODO: move this line elsewhere in pipeline to handle image sizes
-    bg = bg[
-        bg.shape[0] - fg.shape[0] : bg.shape[0],
-        bg.shape[1] - fg.shape[1] : bg.shape[1],
-        :,
-    ]
+    """ Superimposes cropped foreground from grabcut onto background image"""
 
     # performing erosion on binary fg image
     gray_fg = cv.cvtColor(fg, cv.COLOR_BGR2GRAY)

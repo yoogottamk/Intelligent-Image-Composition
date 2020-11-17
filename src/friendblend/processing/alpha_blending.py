@@ -7,7 +7,7 @@ import numpy as np
 
 
 def alpha_blend(img_l, img_r, bb_l, bb_r):
-
+    """Performs alpha blending on the images"""
     # defining variables described in the paper
     col_start = bb_l[0] + bb_l[2]
     col_end = bb_r[0]

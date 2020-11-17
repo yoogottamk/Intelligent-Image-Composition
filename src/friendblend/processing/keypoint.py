@@ -59,6 +59,7 @@ def find_homography(kps1, ds1, kps2, ds2, max_distance=30):
     """
     log = logging.getLogger()
 
+    # Get matches using BFMatcher
     matches = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True).match(ds1, ds2)
     matches = list(filter(lambda x: x.distance < max_distance, matches))
 
@@ -72,6 +73,7 @@ def find_homography(kps1, ds1, kps2, ds2, max_distance=30):
     src = np.array(src).reshape((-1, 1, 2))
     dest = np.array(dest).reshape((-1, 1, 2))
 
+    # Compute homography
     H, mask = cv.findHomography(src, dest, cv.RANSAC)
 
     if not mask.any():
