@@ -27,6 +27,7 @@ log_all_in_module(processing.face_body_detection)
 log_all_in_module(processing.keypoint)
 log_all_in_module(processing.alpha_blending)
 log_all_in_module(processing.grab_cut)
+log_all_in_module(processing.grabcut.grabcut)
 
 
 def _process_blend(img):
@@ -46,7 +47,9 @@ class Blend:
     def __init__(self, img1_path: str, img2_path: str):
         self.log = logging.getLogger()
         self.img1 = Blend.resize(self.imload(img1_path, ensure_success=True), 900, None)
-        self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, self.img1.shape[0])
+        self.img2 = Blend.resize(
+            self.imload(img2_path, ensure_success=True), 900, self.img1.shape[0]
+        )
 
     def imload(
         self, img_path, mode: int = 1, ensure_success: bool = False
@@ -216,14 +219,13 @@ class Blend:
         # imshow(boxed1)
         # imshow(boxed2)
 
-
         # compute homography (uses ORB)
         H = Blend.get_homography(cc1, cc2, bb1, bb2)
 
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
-        if  bb2[0] - (bb1[0] + bb1[2]) > 100:
+        if bb2[0] - (bb1[0] + bb1[2]) > 100:
             self.log.info("Using Alpha Blending to merge the images")
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
         else:

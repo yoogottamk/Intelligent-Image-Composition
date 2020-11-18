@@ -2,10 +2,13 @@
 Grab Cut
 """
 
+from typing import Tuple
+
 import cv2 as cv
 import numpy as np
 
 from friendblend.helpers import imshow
+from friendblend.processing.helpers import connected
 from friendblend.processing.grabcut.grabcut import GrabCut
 
 
@@ -38,28 +41,42 @@ def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
     # Run grabcut
     if not use_own:
         # Use library grabcut
-        mask, fg_model, bg_model = cv.grabCut(
+        mask, _, _ = cv.grabCut(
             img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
         )
-
-        # Mask out image using mask obtained from grabcut
-        mask = np.where(
-            np.bitwise_or(mask == cv.GC_PR_BGD, mask == cv.GC_BGD), 0, 1
-        ).astype("uint8")
-        img = img_l * mask[:, :, np.newaxis]
     else:
         GC = GrabCut(img_l, 5, mask)
-        GC.run()
-        img = GC.show()
+        mask = GC.run()
 
+    # Mask out image using mask obtained from grabcut
+    mask = np.where(
+        np.bitwise_or(mask == cv.GC_PR_BGD, mask == cv.GC_BGD), 0, 1
+    ).astype("uint8")
+
+    mask = filter_mask(mask, fb_l)
+
+    img = img_l * mask[:, :, np.newaxis]
     # imshow(img)
 
     return crop_fg(img, img_r)
 
 
-def crop_fg(fg, bg):
-    """ Superimposes cropped foreground from grabcut onto background image"""
+def filter_mask(mask: np.ndarray, fb: Tuple[int, int, int, int]) -> np.ndarray:
+    """
+    Removes components which are not connected to the face bounding box from foreground
+    """
+    fx, fy, fw, fh = fb
+    face_mid = (fy + (fh // 2), fx + (fw // 2))
 
+    labels = connected(mask)
+
+    return np.where(labels == labels[face_mid], 1, 0).astype("uint8")
+
+
+def crop_fg(fg, bg):
+    """
+    Superimposes cropped foreground from grabcut onto background image
+    """
     # performing erosion on binary fg image
     gray_fg = cv.cvtColor(fg, cv.COLOR_BGR2GRAY)
     _, mask = cv.threshold(gray_fg, 0, 1, cv.THRESH_BINARY)
