@@ -6,9 +6,10 @@ import cv2 as cv
 import numpy as np
 
 from friendblend.helpers import imshow
+from friendblend.processing.grabcut.grabcut import GrabCut
 
 
-def grab_cut(img_l, img_r, fb_l, boundary=15):
+def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
     """
     Performs grabcut
      - extracts face from img_l using face bounding boxes
@@ -34,17 +35,22 @@ def grab_cut(img_l, img_r, fb_l, boundary=15):
         max(0, fb_x - boundary) : min(fb_x + fb_w + boundary, w),
     ] = cv.GC_FGD
 
-
     # Run grabcut
-    mask, fg_model, bg_model = cv.grabCut(
-        img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
-    )
+    if not use_own:
+        # Use library grabcut
+        mask, fg_model, bg_model = cv.grabCut(
+            img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
+        )
 
-    # Mask out image using mask obtained from grabcut
-    mask = np.where(
-        np.bitwise_or(mask == cv.GC_PR_BGD, mask == cv.GC_BGD), 0, 1
-    ).astype("uint8")
-    img = img_l * mask[:, :, np.newaxis]
+        # Mask out image using mask obtained from grabcut
+        mask = np.where(
+            np.bitwise_or(mask == cv.GC_PR_BGD, mask == cv.GC_BGD), 0, 1
+        ).astype("uint8")
+        img = img_l * mask[:, :, np.newaxis]
+    else:
+        GC = GrabCut(img_l, 5, mask)
+        GC.run()
+        img = GC.show()
 
     # imshow(img)
 

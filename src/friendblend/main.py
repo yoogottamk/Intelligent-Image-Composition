@@ -159,7 +159,7 @@ class Blend:
         bbs = [bb1, bb2]
         boxeds = [boxed1, boxed2]
 
-        if (bb1[0] + bb1[2]) > bb2[0]:
+        if bb1[0] > bb2[0]:
             self.img2, self.img1 = self.img1, self.img2
             self.log.info("Swapping image order")
             imgs.reverse()
@@ -216,13 +216,14 @@ class Blend:
         # imshow(boxed1)
         # imshow(boxed2)
 
+
         # compute homography (uses ORB)
         H = Blend.get_homography(cc1, cc2, bb1, bb2)
 
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
         # imshow(np.hstack([warp_img, cc2]))
 
-        if abs(bb1[0] + bb1[2] - bb2[0]) > 50:
+        if  bb2[0] - (bb1[0] + bb1[2]) > 100:
             self.log.info("Using Alpha Blending to merge the images")
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
         else:
@@ -242,7 +243,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(message)s",
-        handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=True)],
+        handlers=[RichHandler(rich_tracebacks=True, show_time=False, show_path=False)],
     )
     log = logging.getLogger()
 
@@ -252,8 +253,8 @@ if __name__ == "__main__":
             " Using default images as fallback for demonstration"
         )
 
-        img1_path = "../images/f1.png"
-        img2_path = "../images/f2.png"
+        img1_path = "../images/chaarminar/chaarminar-5.jpg"
+        img2_path = "../images/chaarminar/chaarminar-3.jpg"
     else:
         img1_path = f"../images/{sys.argv[1]}"
         img2_path = f"../images/{sys.argv[2]}"
