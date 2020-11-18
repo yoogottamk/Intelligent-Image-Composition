@@ -35,7 +35,7 @@ def _process_blend(img):
     """
     only functions at module level are pickle-able
     multiprocessing involves pickling stuff so this had to be a top-level function
-    """   
+    """
     return Blend._process_blend(img)
 
 
@@ -48,7 +48,9 @@ class Blend:
     def __init__(self, img1_path: str, img2_path: str):
         self.log = logging.getLogger()
         self.img1 = Blend.resize(self.imload(img1_path, ensure_success=True), 900, None)
-        self.img2 = Blend.resize(self.imload(img2_path, ensure_success=True), 900, self.img1.shape[0])
+        self.img2 = Blend.resize(
+            self.imload(img2_path, ensure_success=True), 900, self.img1.shape[0]
+        )
         self.intermediate_imgs = []
 
     def imload(
@@ -216,7 +218,7 @@ class Blend:
             cc1, cc2, fb1, fb2, bb1, bb2, boxed1, boxed2
         )
 
-        self.intermediate_imgs.extend([cc1,cc2,boxed1,boxed2])
+        self.intermediate_imgs.extend([cc1, cc2, boxed1, boxed2])
 
         # imshow(boxed1)
         # imshow(boxed2)
@@ -229,7 +231,7 @@ class Blend:
 
         self.intermediate_imgs.append(warp_img)
 
-        if  bb2[0] - (bb1[0] + bb1[2]) > 100:
+        if bb2[0] - (bb1[0] + bb1[2]) > 100:
             self.log.info("Using Alpha Blending to merge the images")
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
 
@@ -243,16 +245,26 @@ class Blend:
             img_l, img_r, bb_l, bb_r, fb_l, fb_r = Blend.get_grabcut_order(
                 warp_img, cc2, bb1, bb2, fb1, fb2
             )
-            grabcut_img,blended = Blend.get_grabcut(img_l, img_r, fb_l)
+            grabcut_img, blended = Blend.get_grabcut(img_l, img_r, fb_l)
 
             self.intermediate_imgs.append(grabcut_img)
 
-        file_names = ["cc1.png","cc2.png","bb1.png","bb2.png","warped.png","grabcut.png"]
+        file_names = [
+            "cc1.png",
+            "cc2.png",
+            "bb1.png",
+            "bb2.png",
+            "warped.png",
+            "grabcut.png",
+        ]
 
         for i in range(len(self.intermediate_imgs)):
-            cv.imwrite("../images/outputs/"+str(i)+"-"+file_names[i],self.intermediate_imgs[i])
+            cv.imwrite(
+                "../images/outputs/" + str(i) + "-" + file_names[i],
+                self.intermediate_imgs[i],
+            )
 
-        return blended,self.intermediate_imgs
+        return blended, self.intermediate_imgs
 
 
 global_vars.initialize()
@@ -276,6 +288,6 @@ if __name__ == "__main__":
         img1_path = f"../images/{sys.argv[1]}"
         img2_path = f"../images/{sys.argv[2]}"
 
-    blend,_ = Blend(img1_path, img2_path).blend()
+    blend, _ = Blend(img1_path, img2_path).blend()
 
     cv.imwrite("../images/outputs/final-blended.png", blend)
