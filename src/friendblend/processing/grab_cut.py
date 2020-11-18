@@ -58,7 +58,7 @@ def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
     img = img_l * mask[:, :, np.newaxis]
     # imshow(img)
 
-    return crop_fg(img, img_r)
+    return img,crop_fg(img, img_r)
 
 
 def filter_mask(mask: np.ndarray, fb: Tuple[int, int, int, int]) -> np.ndarray:
