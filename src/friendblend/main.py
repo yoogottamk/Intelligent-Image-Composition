@@ -234,7 +234,7 @@ class Blend:
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
 
             try:
-                os.remove("../images/outputs/grabcut.png")
+                os.remove("../images/outputs/5-grabcut.png")
             except:
                 pass
 
@@ -250,7 +250,7 @@ class Blend:
         file_names = ["cc1.png","cc2.png","bb1.png","bb2.png","warped.png","grabcut.png"]
 
         for i in range(len(self.intermediate_imgs)):
-            cv.imwrite("../images/outputs/"+file_names[i],self.intermediate_imgs[i])
+            cv.imwrite("../images/outputs/"+str(i)+"-"+file_names[i],self.intermediate_imgs[i])
 
         return blended,self.intermediate_imgs
 
