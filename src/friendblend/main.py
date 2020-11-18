@@ -20,14 +20,14 @@ from friendblend.processing import helpers as processing_helpers
 from friendblend.helpers import log_all_methods, log_all_in_module, imshow
 from friendblend import global_vars
 
-from friendblend import processing
+import friendblend
 
-log_all_in_module(processing.color_correction)
-log_all_in_module(processing.face_body_detection)
-log_all_in_module(processing.keypoint)
-log_all_in_module(processing.alpha_blending)
-log_all_in_module(processing.grab_cut)
-log_all_in_module(processing.grabcut.grabcut)
+log_all_in_module(friendblend.processing.color_correction)
+log_all_in_module(friendblend.processing.face_body_detection)
+log_all_in_module(friendblend.processing.keypoint)
+log_all_in_module(friendblend.processing.alpha_blending)
+log_all_in_module(friendblend.processing.grab_cut)
+log_all_in_module(friendblend.processing.grabcut.grabcut)
 
 
 def _process_blend(img):
