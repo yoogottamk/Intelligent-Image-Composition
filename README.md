@@ -44,7 +44,7 @@ We assume that you will be running this on a linux system which has the GNU stan
 
 ### Prerequisites
  - `python3.8`
- - `pip`  
+ - `pip` (corresponding to python3.8)  
 OR  
  - `docker`
 
@@ -107,3 +107,5 @@ project-appy-fizz$ docker run --rm -it -v ${PWD}/images:/images friendblend F1.e
 ```
 
 where files `F1.ext` and `F2.ext` images are present in the `images` directory inside our repository.
+
+The outputs of each intermediate step of the friendblend algorithm, along with the final output, are stored in `images/outputs/` directory.
