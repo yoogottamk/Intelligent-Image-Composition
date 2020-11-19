@@ -89,10 +89,12 @@ class Blend:
         return cv.resize(img, (int(w), int(h)), interpolation=cv.INTER_CUBIC)
 
     @staticmethod
-    def color_correction(img, clip_limit=3.0, n_bins=256, grid=(7, 7)):
+    def color_correction(img, clip_limit=1.0, n_bins=256, grid=(7, 7)):
         """
         Color correction using CLAHE
         """
+
+        clip_limit = 1.0 + 2*np.random.random()
         return apply_clahe(img, clip_limit=clip_limit, n_bins=n_bins, grid=grid)
 
     @staticmethod
@@ -276,7 +278,7 @@ if __name__ == "__main__":
     )
     log = logging.getLogger()
 
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         log.warning(
             "Please provide name of the images. (inside `images` directory at repo root)."
             " Using default images as fallback for demonstration"
@@ -288,6 +290,17 @@ if __name__ == "__main__":
         img1_path = f"../images/{sys.argv[1]}"
         img2_path = f"../images/{sys.argv[2]}"
 
-    blend, _ = Blend(img1_path, img2_path).blend()
+    n_runs = 5
+    if len(sys.argv) == 4:
+        try:
+            n_runs = int(sys.argv[3])
+        except:
+            pass
 
-    cv.imwrite("../images/outputs/final-blended.png", blend)
+    for i in range(n_runs):
+        try:
+            blend, _ = Blend(img1_path, img2_path).blend()
+            cv.imwrite("../images/outputs/final-blended-"+str(i)+".png", blend)
+        except:
+            print(f"Failed at iteration - {i}")
+            logging.exception("Error here!")
