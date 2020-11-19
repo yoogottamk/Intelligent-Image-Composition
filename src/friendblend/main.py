@@ -127,9 +127,9 @@ class Blend:
             kps1, ds1 = t1.result()
             kps2, ds2 = t2.result()
 
-        H = find_homography(kps1, ds1, kps2, ds2)
+        H, matched_img = find_homography(kps1, ds1, kps2, ds2, img1, img2)
 
-        return H
+        return H, matched_img
 
     @staticmethod
     def _process_blend(img):
@@ -221,14 +221,12 @@ class Blend:
 
         self.intermediate_imgs.extend([cc1, cc2, boxed1, boxed2])
 
-        # imshow(boxed1)
-        # imshow(boxed2)
-
         # compute homography (uses ORB)
-        H = Blend.get_homography(cc1, cc2, bb1, bb2)
+        H, matched_img = Blend.get_homography(cc1, cc2, bb1, bb2)
+
+        self.intermediate_imgs.append(matched_img)
 
         warp_img = cv.warpPerspective(cc1, H, cc1.shape[:2][::-1])
-        # imshow(np.hstack([warp_img, cc2]))
 
         self.intermediate_imgs.append(warp_img)
 
@@ -237,7 +235,8 @@ class Blend:
             blended = Blend.get_alpha_blend(warp_img, cc2, bb1, bb2)
 
             try:
-                os.remove("../images/outputs/5-grabcut.png")
+                # :(
+                os.remove("../images/outputs/6-grabcut.png")
             except:
                 pass
 
@@ -255,6 +254,7 @@ class Blend:
             "cc2.png",
             "bb1.png",
             "bb2.png",
+            "keypoints.png",
             "warped.png",
             "grabcut.png",
         ]
