@@ -39,12 +39,15 @@ src
 └── requirements.txt                 # pip install this
 ```
 
+## Code Documentation
+Link to documentation: [https://yoogottamk.github.io/project-appy-fizz/](https://yoogottamk.github.io/project-appy-fizz/)
+
 ## How to run?
 We assume that you will be running this on a linux system which has the GNU standard C Library (most of the normal machines have this).
 
 ### Prerequisites
  - `python3.8`
- - `pip` (corresponding to python3.8)  
+ - `pip` (corresponding to `python3.8`)  
 OR  
  - `docker`
 
