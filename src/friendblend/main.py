@@ -18,7 +18,7 @@ from friendblend.processing.face_body_detection import get_bounds
 from friendblend.processing.grab_cut import grab_cut
 from friendblend.processing.keypoint import ORB, filter_keypoints, find_homography
 from friendblend.processing import helpers as processing_helpers
-from friendblend.helpers import log_all_methods, log_all_in_module, imshow
+from friendblend.helpers import log_all_methods, log_all_in_module
 from friendblend import global_vars
 
 import friendblend
@@ -28,7 +28,6 @@ log_all_in_module(friendblend.processing.face_body_detection)
 log_all_in_module(friendblend.processing.keypoint)
 log_all_in_module(friendblend.processing.alpha_blending)
 log_all_in_module(friendblend.processing.grab_cut)
-log_all_in_module(friendblend.processing.grabcut.grabcut)
 
 
 def _process_blend(img):

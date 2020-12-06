@@ -63,7 +63,7 @@ def log_call(f, log_entry=True, log_exit=True):
                     indent_offset,
                     f.__module__,
                     f.__qualname__,
-                    fmt_print(stringify_call_params(*args, **kwargs),),
+                    fmt_print(stringify_call_params(*args, **kwargs)),
                 )
 
             st = time.time()
@@ -97,9 +97,7 @@ def log_all_methods(log_entry=True, log_exit=True):
         for attr in cls.__dict__:
             _func = getattr(cls, attr)
             if callable(_func):
-                setattr(
-                    cls, attr, log_call(_func, log_entry, log_exit),
-                )
+                setattr(cls, attr, log_call(_func, log_entry, log_exit))
         return cls
 
     return decorate

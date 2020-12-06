@@ -9,10 +9,9 @@ import numpy as np
 
 from friendblend.helpers import imshow
 from friendblend.processing.helpers import connected
-from friendblend.processing.grabcut.grabcut import GrabCut
 
 
-def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
+def grab_cut(img_l, img_r, fb_l, boundary=20):
     """
     Performs grabcut
      - extracts face from img_l using face bounding boxes
@@ -38,15 +37,9 @@ def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
         max(0, fb_x - boundary) : min(fb_x + fb_w + boundary, w),
     ] = cv.GC_FGD
 
-    # Run grabcut
-    if not use_own:
-        # Use library grabcut
-        mask, _, _ = cv.grabCut(
-            img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
-        )
-    else:
-        GC = GrabCut(img_l, 5, mask)
-        mask = GC.run()
+    mask, _, _ = cv.grabCut(
+        img_l, mask, None, bg_model, fg_model, 1, cv.GC_INIT_WITH_MASK
+    )
 
     # Mask out image using mask obtained from grabcut
     mask = np.where(
@@ -58,7 +51,7 @@ def grab_cut(img_l, img_r, fb_l, boundary=20, use_own=False):
     img = img_l * mask[:, :, np.newaxis]
     # imshow(img)
 
-    return img,crop_fg(img, img_r)
+    return img, crop_fg(img, img_r)
 
 
 def filter_mask(mask: np.ndarray, fb: Tuple[int, int, int, int]) -> np.ndarray:
