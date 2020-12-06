@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>friendblend.processing package &mdash; FriendBlend - Team APPY FIZZ 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> FriendBlend - Team APPY FIZZ
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">friendblend.processing package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.alpha_blending">friendblend.processing.alpha_blending module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.color_correction">friendblend.processing.color_correction module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.face_body_detection">friendblend.processing.face_body_detection module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.grab_cut">friendblend.processing.grab_cut module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.helpers">friendblend.processing.helpers module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing.keypoint">friendblend.processing.keypoint module</a></li>
+<li><a class="reference internal" href="#module-friendblend.processing">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">FriendBlend - Team APPY FIZZ</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>friendblend.processing package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/friendblend.processing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="friendblend-processing-package">
+<h1>friendblend.processing package<a class="headerlink" href="#friendblend-processing-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-friendblend.processing.alpha_blending">
+<span id="friendblend-processing-alpha-blending-module"></span><h2>friendblend.processing.alpha_blending module<a class="headerlink" href="#module-friendblend.processing.alpha_blending" title="Permalink to this headline">¶</a></h2>
+<p>Alpha Blending</p>
+<dl class="py function">
+<dt id="friendblend.processing.alpha_blending.alpha_blend">
+<code class="sig-prename descclassname">friendblend.processing.alpha_blending.</code><code class="sig-name descname">alpha_blend</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_l</span></em>, <em class="sig-param"><span class="n">img_r</span></em>, <em class="sig-param"><span class="n">bb_l</span></em>, <em class="sig-param"><span class="n">bb_r</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/alpha_blending.html#alpha_blend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.alpha_blending.alpha_blend" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs alpha blending on the images</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing.color_correction">
+<span id="friendblend-processing-color-correction-module"></span><h2>friendblend.processing.color_correction module<a class="headerlink" href="#module-friendblend.processing.color_correction" title="Permalink to this headline">¶</a></h2>
+<p>Contains code for color correction of the image.
+CLAHE - Contrast Limited Adaptive Histogram Equalization</p>
+<dl class="py function">
+<dt id="friendblend.processing.color_correction.apply_clahe">
+<code class="sig-prename descclassname">friendblend.processing.color_correction.</code><code class="sig-name descname">apply_clahe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">clip_limit</span><span class="o">=</span><span class="default_value">3.0</span></em>, <em class="sig-param"><span class="n">n_bins</span><span class="o">=</span><span class="default_value">256</span></em>, <em class="sig-param"><span class="n">grid</span><span class="o">=</span><span class="default_value">(7, 7)</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/color_correction.html#apply_clahe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.color_correction.apply_clahe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Parameters:</dt><dd><ul class="simple">
+<li><p>The input image in BGR format</p></li>
+<li><p>The clip limit for contrast limiting</p></li>
+<li><p>Number of bins to divide the image into</p></li>
+<li><p>Grid size to be used while performing adaptive histogram equalization</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.color_correction.clahe">
+<code class="sig-prename descclassname">friendblend.processing.color_correction.</code><code class="sig-name descname">clahe</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">clip_limit</span><span class="o">=</span><span class="default_value">3.0</span></em>, <em class="sig-param"><span class="n">n_bins</span><span class="o">=</span><span class="default_value">256</span></em>, <em class="sig-param"><span class="n">grid</span><span class="o">=</span><span class="default_value">(7, 7)</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/color_correction.html#clahe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.color_correction.clahe" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><p>Divides the image into frames/cells using the grid values passed to the function</p></li>
+<li><p>Creates a separate histogram for each cell/frame after binning the values</p></li>
+<li><p>The histogram equalization mapping for each cell/frame is also generated</p></li>
+<li><p>The contrast of the image is limited by clipping bin values with ‘clip_limit’</p></li>
+<li><p>Adaptive histogram equalization</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.color_correction.rgb2lab">
+<code class="sig-prename descclassname">friendblend.processing.color_correction.</code><code class="sig-name descname">rgb2lab</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/color_correction.html#rgb2lab"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.color_correction.rgb2lab" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts an RGB image to L*a*b* space
+Implements formulas described at:
+<a class="reference external" href="https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html">https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html</a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing.face_body_detection">
+<span id="friendblend-processing-face-body-detection-module"></span><h2>friendblend.processing.face_body_detection module<a class="headerlink" href="#module-friendblend.processing.face_body_detection" title="Permalink to this headline">¶</a></h2>
+<p>Face and body detection</p>
+<dl class="py function">
+<dt id="friendblend.processing.face_body_detection.get_body">
+<code class="sig-prename descclassname">friendblend.processing.face_body_detection.</code><code class="sig-name descname">get_body</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">face_bounds</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/face_body_detection.html#get_body"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.face_body_detection.get_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the body bounds using face bounds</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.face_body_detection.get_bounds">
+<code class="sig-prename descclassname">friendblend.processing.face_body_detection.</code><code class="sig-name descname">get_bounds</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/face_body_detection.html#get_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.face_body_detection.get_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates and returns face and body bounds
+Can die in between</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.face_body_detection.get_face">
+<code class="sig-prename descclassname">friendblend.processing.face_body_detection.</code><code class="sig-name descname">get_face</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/face_body_detection.html#get_face"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.face_body_detection.get_face" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the face bounds
+Can die in between</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing.grab_cut">
+<span id="friendblend-processing-grab-cut-module"></span><h2>friendblend.processing.grab_cut module<a class="headerlink" href="#module-friendblend.processing.grab_cut" title="Permalink to this headline">¶</a></h2>
+<p>Grab Cut</p>
+<dl class="py function">
+<dt id="friendblend.processing.grab_cut.crop_fg">
+<code class="sig-prename descclassname">friendblend.processing.grab_cut.</code><code class="sig-name descname">crop_fg</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">fg</span></em>, <em class="sig-param"><span class="n">bg</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/grab_cut.html#crop_fg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.grab_cut.crop_fg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Superimposes cropped foreground from grabcut onto background image</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.grab_cut.filter_mask">
+<code class="sig-prename descclassname">friendblend.processing.grab_cut.</code><code class="sig-name descname">filter_mask</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">mask</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em>, <em class="sig-param"><span class="n">fb</span><span class="p">:</span> <span class="n">Tuple<span class="p">[</span>int<span class="p">, </span>int<span class="p">, </span>int<span class="p">, </span>int<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/friendblend/processing/grab_cut.html#filter_mask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.grab_cut.filter_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes components which are not connected to the face bounding box from foreground</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.grab_cut.grab_cut">
+<code class="sig-prename descclassname">friendblend.processing.grab_cut.</code><code class="sig-name descname">grab_cut</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img_l</span></em>, <em class="sig-param"><span class="n">img_r</span></em>, <em class="sig-param"><span class="n">fb_l</span></em>, <em class="sig-param"><span class="n">boundary</span><span class="o">=</span><span class="default_value">20</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/grab_cut.html#grab_cut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.grab_cut.grab_cut" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Performs grabcut</dt><dd><ul class="simple">
+<li><p>extracts face from img_l using face bounding boxes</p></li>
+<li><p>blends the two images</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing.helpers">
+<span id="friendblend-processing-helpers-module"></span><h2>friendblend.processing.helpers module<a class="headerlink" href="#module-friendblend.processing.helpers" title="Permalink to this headline">¶</a></h2>
+<p>Common functions used multiple times</p>
+<dl class="py class">
+<dt id="friendblend.processing.helpers.DSU">
+<em class="property">class </em><code class="sig-prename descclassname">friendblend.processing.helpers.</code><code class="sig-name descname">DSU</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/helpers.html#DSU"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.DSU" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The union-find algorithm</p>
+<dl class="py method">
+<dt id="friendblend.processing.helpers.DSU.find">
+<code class="sig-name descname">find</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/helpers.html#DSU.find"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.DSU.find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the parent of i’th index</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="friendblend.processing.helpers.DSU.union">
+<code class="sig-name descname">union</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">i</span></em>, <em class="sig-param"><span class="n">j</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/helpers.html#DSU.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.DSU.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Puts i and j under the same subtree</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.helpers.connected">
+<code class="sig-prename descclassname">friendblend.processing.helpers.</code><code class="sig-name descname">connected</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span><span class="p">:</span> <span class="n">numpy.ndarray</span></em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/friendblend/processing/helpers.html#connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connected components, implementing 4-connectivity</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.helpers.draw_box">
+<code class="sig-prename descclassname">friendblend.processing.helpers.</code><code class="sig-name descname">draw_box</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">img</span></em>, <em class="sig-param"><span class="n">bounding_box</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/helpers.html#draw_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.draw_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws a bounding box in image</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.helpers.pt_in_box">
+<code class="sig-prename descclassname">friendblend.processing.helpers.</code><code class="sig-name descname">pt_in_box</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pt</span></em>, <em class="sig-param"><span class="n">box</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/helpers.html#pt_in_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.helpers.pt_in_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>pt: (x1, y1)
+box: (x, y, w, h)</p>
+<p>returns whether point is within box</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing.keypoint">
+<span id="friendblend-processing-keypoint-module"></span><h2>friendblend.processing.keypoint module<a class="headerlink" href="#module-friendblend.processing.keypoint" title="Permalink to this headline">¶</a></h2>
+<p>Contains code for keypoint detection and matching</p>
+<dl class="py class">
+<dt id="friendblend.processing.keypoint.ORB">
+<em class="property">class </em><code class="sig-prename descclassname">friendblend.processing.keypoint.</code><code class="sig-name descname">ORB</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/keypoint.html#ORB"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.keypoint.ORB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Wrapper over opencv ORB</p>
+<dl class="py method">
+<dt id="friendblend.processing.keypoint.ORB.get_descriptors">
+<code class="sig-name descname">get_descriptors</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kps</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/keypoint.html#ORB.get_descriptors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.keypoint.ORB.get_descriptors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ORB descriptors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="friendblend.processing.keypoint.ORB.get_keypoints">
+<code class="sig-name descname">get_keypoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/keypoint.html#ORB.get_keypoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.keypoint.ORB.get_keypoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns ORB keypoints</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.keypoint.filter_keypoints">
+<code class="sig-prename descclassname">friendblend.processing.keypoint.</code><code class="sig-name descname">filter_keypoints</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">box1</span></em>, <em class="sig-param"><span class="n">box2</span></em>, <em class="sig-param"><span class="n">kps</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/keypoint.html#filter_keypoints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.keypoint.filter_keypoints" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only returns keypoints which are NOT in box1 or box2</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="friendblend.processing.keypoint.find_homography">
+<code class="sig-prename descclassname">friendblend.processing.keypoint.</code><code class="sig-name descname">find_homography</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">kps1</span></em>, <em class="sig-param"><span class="n">ds1</span></em>, <em class="sig-param"><span class="n">kps2</span></em>, <em class="sig-param"><span class="n">ds2</span></em>, <em class="sig-param"><span class="n">img1</span></em>, <em class="sig-param"><span class="n">img2</span></em>, <em class="sig-param"><span class="n">max_distance</span><span class="o">=</span><span class="default_value">30</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/friendblend/processing/keypoint.html#find_homography"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#friendblend.processing.keypoint.find_homography" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses bruteforce matcher with hamming distance to compute homography
+fails if matches found are less than <cite>min_matches</cite></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-friendblend.processing">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-friendblend.processing" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

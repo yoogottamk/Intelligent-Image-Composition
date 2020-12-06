@@ -1,0 +1,507 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>friendblend.processing.color_correction &mdash; FriendBlend - Team APPY FIZZ 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> FriendBlend - Team APPY FIZZ
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">FriendBlend - Team APPY FIZZ</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>friendblend.processing.color_correction</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for friendblend.processing.color_correction</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Contains code for color correction of the image.</span>
+<span class="sd">CLAHE - Contrast Limited Adaptive Histogram Equalization</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;rgb2lab&quot;</span><span class="p">,</span> <span class="s2">&quot;clahe&quot;</span><span class="p">,</span> <span class="s2">&quot;apply_clahe&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="rgb2lab"><a class="viewcode-back" href="../../../friendblend.processing.html#friendblend.processing.color_correction.rgb2lab">[docs]</a><span class="k">def</span> <span class="nf">rgb2lab</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts an RGB image to L*a*b* space</span>
+<span class="sd">    Implements formulas described at:</span>
+<span class="sd">    https://docs.opencv.org/3.4/de/d25/imgproc_color_conversions.html</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function for RGB to Lab conversion</span>
+<span class="sd">        Detailed description in the link above</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">mask1</span> <span class="o">=</span> <span class="n">X</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
+        <span class="n">mask2</span> <span class="o">=</span> <span class="n">X</span> <span class="o">&lt;=</span> <span class="mf">0.008856</span>
+
+        <span class="n">X</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="n">mask2</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mi">16</span> <span class="o">/</span> <span class="mi">116</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">X</span>
+
+    <span class="c1"># converts image to be in [0,1] range</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">/=</span> <span class="mf">255.0</span>
+
+    <span class="c1"># accounts for sRGB conversion</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">**</span> <span class="mf">2.2</span>
+
+    <span class="c1"># converts to XYZ first</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.412453</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.357580</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.180423</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.212671</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.715160</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.072169</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.019334</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.119193</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.950227</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># initializing constants</span>
+    <span class="n">Xn</span> <span class="o">=</span> <span class="mf">0.950456</span>
+    <span class="n">Zn</span> <span class="o">=</span> <span class="mf">1.088754</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># converting from XYZ to Lab as described by the formulas</span>
+    <span class="n">X</span> <span class="o">/=</span> <span class="n">Xn</span>
+    <span class="n">Z</span> <span class="o">/=</span> <span class="n">Zn</span>
+
+    <span class="n">mask1</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
+    <span class="n">mask2</span> <span class="o">=</span> <span class="n">Y</span> <span class="o">&lt;=</span> <span class="mf">0.008856</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">L</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">116</span> <span class="o">*</span> <span class="p">(</span><span class="n">L</span><span class="p">[</span><span class="n">mask1</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="mi">16</span>
+    <span class="n">L</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">903.3</span> <span class="o">*</span> <span class="n">L</span><span class="p">[</span><span class="n">mask2</span><span class="p">]</span>
+
+    <span class="c1"># f(X) defined above</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">500</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span> <span class="o">+</span> <span class="n">delta</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="mi">200</span> <span class="o">*</span> <span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span> <span class="o">-</span> <span class="n">f</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span> <span class="o">+</span> <span class="n">delta</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span> <span class="p">(</span><span class="mi">255</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="mi">128</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">128</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">L</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_interpolate</span><span class="p">(</span><span class="n">c_sub_bin</span><span class="p">,</span> <span class="n">map_ul</span><span class="p">,</span> <span class="n">map_ur</span><span class="p">,</span> <span class="n">map_dl</span><span class="p">,</span> <span class="n">map_dr</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolates the values of the pixels in patches around the current pixel patch and</span>
+<span class="sd">    finds the value for the current pixel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initializing output</span>
+    <span class="n">c_sub_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">c_sub_bin</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># implementing the formula</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_frame_size</span><span class="p">):</span>
+        <span class="n">i_inv</span> <span class="o">=</span> <span class="n">x_frame_size</span> <span class="o">-</span> <span class="n">i</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_frame_size</span><span class="p">):</span>
+            <span class="n">j_inv</span> <span class="o">=</span> <span class="n">y_frame_size</span> <span class="o">-</span> <span class="n">j</span>
+
+            <span class="n">val</span> <span class="o">=</span> <span class="n">c_sub_bin</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">c_sub_image</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_inv</span> <span class="o">*</span> <span class="p">(</span><span class="n">j_inv</span> <span class="o">*</span> <span class="n">map_ul</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">map_ur</span><span class="p">[</span><span class="n">val</span><span class="p">])</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span>
+                <span class="n">j_inv</span> <span class="o">*</span> <span class="n">map_dl</span><span class="p">[</span><span class="n">val</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">map_dr</span><span class="p">[</span><span class="n">val</span><span class="p">]</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">c_sub_image</span> <span class="o">/</span> <span class="p">(</span><span class="n">x_frame_size</span> <span class="o">*</span> <span class="n">y_frame_size</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">generate_histograms</span><span class="p">(</span>
+    <span class="n">bins</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates the histogram required for each patch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">hist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_x_divs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_y_divs</span><span class="p">):</span>
+            <span class="c1"># gets the current frame (it&#39;s binned values)</span>
+            <span class="n">c_bin</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span>
+                <span class="n">i</span> <span class="o">*</span> <span class="n">x_frame_size</span> <span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x_frame_size</span><span class="p">,</span>
+                <span class="n">j</span> <span class="o">*</span> <span class="n">y_frame_size</span> <span class="p">:</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_frame_size</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="n">c_bin</span> <span class="o">=</span> <span class="n">c_bin</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+
+            <span class="c1"># updates the current frame&#39;s histogram</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x_frame_size</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y_frame_size</span><span class="p">):</span>
+                    <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">[</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">hist</span>
+
+
+<span class="k">def</span> <span class="nf">clip_histogram</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">clip_limit</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Clips the histograms using the limit set</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_x_divs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_y_divs</span><span class="p">):</span>
+            <span class="n">total_overflow</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">c_bin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">):</span>
+                <span class="n">overflow</span> <span class="o">=</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">-</span> <span class="n">clip_limit</span>
+                <span class="k">if</span> <span class="n">overflow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">total_overflow</span> <span class="o">+=</span> <span class="n">overflow</span>
+
+            <span class="c1"># to redistribute intensities across each bin</span>
+            <span class="n">inc_bin_val</span> <span class="o">=</span> <span class="n">total_overflow</span> <span class="o">/</span> <span class="n">n_bins</span>
+
+            <span class="c1"># new upper limit for each bin based on how the redistribution has to be done</span>
+            <span class="n">upper</span> <span class="o">=</span> <span class="n">clip_limit</span> <span class="o">-</span> <span class="n">inc_bin_val</span>
+
+            <span class="c1"># redistributing</span>
+            <span class="k">for</span> <span class="n">c_bin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">clip_limit</span><span class="p">:</span>
+                    <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">=</span> <span class="n">clip_limit</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">:</span>
+                        <span class="n">total_overflow</span> <span class="o">-=</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">-</span> <span class="n">upper</span>
+                        <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">=</span> <span class="n">clip_limit</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">+=</span> <span class="n">inc_bin_val</span>
+                        <span class="n">total_overflow</span> <span class="o">-=</span> <span class="n">inc_bin_val</span>
+
+            <span class="c1"># if there is still some overflow, then uniformly divide the overflow into each bin</span>
+            <span class="k">if</span> <span class="n">total_overflow</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">div_uniform</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">total_overflow</span> <span class="o">//</span> <span class="n">n_bins</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">c_bin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">):</span>
+                    <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">+=</span> <span class="n">div_uniform</span>
+                    <span class="n">total_overflow</span> <span class="o">-=</span> <span class="n">div_uniform</span>
+                    <span class="k">if</span> <span class="n">total_overflow</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">hist</span>
+
+
+<span class="k">def</span> <span class="nf">create_eq_mappings</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">frame_size</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates the histogram equalization mapping function for each patch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_val</span> <span class="o">=</span> <span class="mi">255</span>
+    <span class="n">min_val</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">maps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">))</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_val</span> <span class="o">-</span> <span class="n">min_val</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">frame_size</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_x_divs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_y_divs</span><span class="p">):</span>
+            <span class="n">c_sum</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">c_bin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_bins</span><span class="p">):</span>
+                <span class="n">c_sum</span> <span class="o">+=</span> <span class="n">hist</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span>
+                <span class="n">maps</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">c_bin</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">((</span><span class="n">c_sum</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span> <span class="o">+</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">min_val</span><span class="p">,</span> <span class="n">max_val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">maps</span>
+
+
+<span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">maps</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Wrapper function for the above _interpolate function</span>
+<span class="sd">    Performs the interpolation on pixels of each patch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x_offset</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_x_divs</span><span class="p">):</span>
+        <span class="n">x_up</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">x_down</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">grid_x_divs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">y_offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">grid_y_divs</span><span class="p">):</span>
+            <span class="n">y_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">y_right</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="n">grid_y_divs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># gets the equalization maps of neighboring patches</span>
+            <span class="n">map_ul</span> <span class="o">=</span> <span class="n">maps</span><span class="p">[</span><span class="n">x_up</span><span class="p">,</span> <span class="n">y_left</span><span class="p">]</span>
+            <span class="n">map_ur</span> <span class="o">=</span> <span class="n">maps</span><span class="p">[</span><span class="n">x_up</span><span class="p">,</span> <span class="n">y_right</span><span class="p">]</span>
+            <span class="n">map_dl</span> <span class="o">=</span> <span class="n">maps</span><span class="p">[</span><span class="n">x_down</span><span class="p">,</span> <span class="n">y_left</span><span class="p">]</span>
+            <span class="n">map_dr</span> <span class="o">=</span> <span class="n">maps</span><span class="p">[</span><span class="n">x_down</span><span class="p">,</span> <span class="n">y_right</span><span class="p">]</span>
+
+            <span class="c1"># gets the current bin</span>
+            <span class="n">c_sub_bin</span> <span class="o">=</span> <span class="n">bins</span><span class="p">[</span>
+                <span class="n">x_offset</span> <span class="p">:</span> <span class="n">x_offset</span> <span class="o">+</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_offset</span> <span class="p">:</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="n">y_frame_size</span>
+            <span class="p">]</span>
+
+            <span class="c1"># gets the interpolated values for current patch</span>
+            <span class="n">c_sub_image</span> <span class="o">=</span> <span class="n">_interpolate</span><span class="p">(</span>
+                <span class="n">c_sub_bin</span><span class="p">,</span> <span class="n">map_ul</span><span class="p">,</span> <span class="n">map_ur</span><span class="p">,</span> <span class="n">map_dl</span><span class="p">,</span> <span class="n">map_dr</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span>
+            <span class="p">)</span>
+
+            <span class="c1"># adds current patch interpolated values to the final result</span>
+            <span class="n">res</span><span class="p">[</span>
+                <span class="n">x_offset</span> <span class="p">:</span> <span class="n">x_offset</span> <span class="o">+</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_offset</span> <span class="p">:</span> <span class="n">y_offset</span> <span class="o">+</span> <span class="n">y_frame_size</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">c_sub_image</span>
+            <span class="n">y_offset</span> <span class="o">+=</span> <span class="n">y_frame_size</span>
+        <span class="n">x_offset</span> <span class="o">+=</span> <span class="n">x_frame_size</span>
+
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<div class="viewcode-block" id="clahe"><a class="viewcode-back" href="../../../friendblend.processing.html#friendblend.processing.color_correction.clahe">[docs]</a><span class="k">def</span> <span class="nf">clahe</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">clip_limit</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    - Divides the image into frames/cells using the grid values passed to the function</span>
+<span class="sd">    - Creates a separate histogram for each cell/frame after binning the values</span>
+<span class="sd">    - The histogram equalization mapping for each cell/frame is also generated</span>
+<span class="sd">    - The contrast of the image is limited by clipping bin values with &#39;clip_limit&#39;</span>
+<span class="sd">    - Adaptive histogram equalization</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">grid</span><span class="p">))</span>
+
+    <span class="c1"># find amount of padding needed and apply</span>
+    <span class="n">padding_x</span> <span class="o">=</span> <span class="n">grid_x_divs</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span> <span class="o">%</span> <span class="n">grid_x_divs</span><span class="p">)</span>
+    <span class="n">padding_y</span> <span class="o">=</span> <span class="n">grid_y_divs</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span> <span class="o">%</span> <span class="n">grid_y_divs</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">padding_x</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">padding_x</span><span class="p">,</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">padding_y</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">padding_y</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># initialize result</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># get size of each cell/frame in the grid</span>
+    <span class="n">x_frame_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">grid_x_divs</span><span class="p">)</span>
+    <span class="n">y_frame_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">grid_y_divs</span><span class="p">)</span>
+    <span class="n">frame_size</span> <span class="o">=</span> <span class="n">x_frame_size</span> <span class="o">*</span> <span class="n">y_frame_size</span>
+
+    <span class="c1"># set clip limit</span>
+    <span class="n">clip_limit</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">clip_limit</span> <span class="o">*</span> <span class="n">x_frame_size</span> <span class="o">*</span> <span class="n">y_frame_size</span> <span class="o">/</span> <span class="n">n_bins</span><span class="p">)</span>
+
+    <span class="c1"># generate Look Up Table and put pixel intensities into their bins</span>
+    <span class="n">bin_size</span> <span class="o">=</span> <span class="mf">256.0</span> <span class="o">/</span> <span class="n">n_bins</span>
+    <span class="n">LUT</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span> <span class="o">/</span> <span class="n">bin_size</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">)</span>
+    <span class="n">bins</span> <span class="o">=</span> <span class="n">LUT</span><span class="p">[</span><span class="n">img</span><span class="p">]</span>
+
+    <span class="c1"># creating separate histograms for each frame/cell</span>
+    <span class="n">hist</span> <span class="o">=</span> <span class="n">generate_histograms</span><span class="p">(</span>
+        <span class="n">bins</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span>
+    <span class="p">)</span>
+
+    <span class="c1"># clipping the histogram to limit contrast</span>
+    <span class="n">hist</span> <span class="o">=</span> <span class="n">clip_histogram</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">clip_limit</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">)</span>
+
+    <span class="c1"># creating the equalization mapping</span>
+    <span class="n">maps</span> <span class="o">=</span> <span class="n">create_eq_mappings</span><span class="p">(</span><span class="n">hist</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">frame_size</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">)</span>
+
+    <span class="c1"># Interpolating the values from surrounding frames</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">interpolate</span><span class="p">(</span>
+        <span class="n">res</span><span class="p">,</span> <span class="n">maps</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">grid_x_divs</span><span class="p">,</span> <span class="n">grid_y_divs</span><span class="p">,</span> <span class="n">x_frame_size</span><span class="p">,</span> <span class="n">y_frame_size</span>
+    <span class="p">)</span>
+
+    <span class="c1"># return result without padding</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[:</span><span class="n">h</span><span class="p">,</span> <span class="p">:</span><span class="n">w</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_clahe"><a class="viewcode-back" href="../../../friendblend.processing.html#friendblend.processing.color_correction.apply_clahe">[docs]</a><span class="k">def</span> <span class="nf">apply_clahe</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">clip_limit</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span> <span class="n">n_bins</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">     - The input image in BGR format</span>
+<span class="sd">     - The clip limit for contrast limiting</span>
+<span class="sd">     - Number of bins to divide the image into</span>
+<span class="sd">     - Grid size to be used while performing adaptive histogram equalization</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># conversion to Lab space</span>
+    <span class="n">img_lab</span> <span class="o">=</span> <span class="n">rgb2lab</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+    <span class="c1"># performing CLAHE on L channel and replacing original L channel with it</span>
+    <span class="n">clahe_L</span> <span class="o">=</span> <span class="n">clahe</span><span class="p">(</span><span class="n">img_lab</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">clip_limit</span><span class="p">,</span> <span class="n">n_bins</span><span class="p">,</span> <span class="n">grid</span><span class="p">)</span>
+    <span class="n">img_clahe</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">clahe_L</span><span class="p">,</span> <span class="n">img_lab</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">img_lab</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]])</span>
+
+    <span class="k">return</span> <span class="n">cv</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img_clahe</span><span class="p">,</span> <span class="n">cv</span><span class="o">.</span><span class="n">COLOR_LAB2BGR</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright 
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
