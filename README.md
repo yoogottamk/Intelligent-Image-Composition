@@ -40,7 +40,7 @@ src
 ```
 
 ## Code Documentation
-Link to documentation: [https://yoogottamk.github.io/project-appy-fizz/](https://yoogottamk.github.io/project-appy-fizz/)
+Link to documentation: [https://yoogottamk.github.io/Intelligent-Image-Composition/](https://yoogottamk.github.io/Intelligent-Image-Composition/)
 
 ## How to run?
 We assume that you will be running this on a linux system which has the GNU standard C Library (most of the normal machines have this).
